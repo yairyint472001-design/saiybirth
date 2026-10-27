@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday!</title>
+    <!-- Tailwind CSS for modern responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Pacifico for birthday headings -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Tone.js for web audio sound effects and music -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        .font-pacifico {
+            font-family: 'Pacifico', cursive;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #fdf2f8 0%, #fae8ff 50%, #f3e8ff 100%);
+            min-height: 100vh;
+        }
+        /* Cake and candle animations */
+        .candle {
+            transition: transform 0.3s ease;
+        }
+        .flame {
+            animation: flicker 0.6s infinite alternate;
+            transform-origin: bottom center;
+        }
+        @keyframes flicker {
+            0% { transform: scale(1) rotate(-2deg); opacity: 0.9; }
+            100% { transform: scale(1.15) rotate(2deg); opacity: 1; filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.8)); }
+        }
+        .smoke {
+            animation: rise 1.5s linear forwards;
+        }
+        @keyframes rise {
+            0% { transform: translateY(0) scale(0.5); opacity: 0.8; }
+            100% { transform: translateY(-40px) scale(1.5); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-800">
+
+    <!-- Top Navigation / Controls Bar -->
+    <header class="w-full p-4 flex justify-between items-center max-w-4xl mx-auto z-10">
+        <div class="flex items-center space-x-2">
+            <span class="bg-pink-500 text-white p-2 rounded-full shadow-md"><i class="fa-solid fa-cake-candles"></i></span>
+            <span class="font-pacifico text-xl text-pink-600">Celebration</span>
+        </div>
+        <div class="flex items-center space-x-3">
+            <!-- Music Toggle Button -->
+            <button id="musicToggle" class="bg-white/80 hover:bg-white text-pink-600 px-4 py-2 rounded-full shadow-md border border-pink-200 flex items-center space-x-2 text-sm font-medium transition active:scale-95">
+                <i class="fa-solid fa-music" id="musicIcon"></i>
+                <span id="musicText">Play Music</span>
+            </button>
+            <!-- Custom Message Editor Button -->
+            <button id="openModalBtn" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-full shadow-md text-sm font-medium transition active:scale-95 flex items-center space-x-1">
+                <i class="fa-solid fa-pen"></i>
+                <span class="hidden sm:inline">Edit Wish</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow flex flex-col items-center justify-center p-4 max-w-3xl mx-auto w-full text-center space-y-8 my-auto">
+
+        <!-- Birthday Greeting Hero -->
+        <div class="space-y-3 w-full">
+            <div class="inline-block bg-pink-100 text-pink-700 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase shadow-sm">
+                🎉 Special Day Alert
+            </div>
+            <h1 id="displayTitle" class="font-pacifico text-4xl sm:text-6xl text-pink-600 drop-shadow-sm">
+                Happy Birthday, My sister SAIY!
+            </h1>
+            <p id="displayMessage" class="text-slate-600 text-base sm:text-lg max-w-xl mx-auto px-4">
+                Wishing you a day filled with happiness and a year filled with best things. Make a wish and blow out the candles! ✨
+            </p>
+        </div>
+
+        <!-- Interactive Cake Card -->
+        <div class="bg-white/80 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl border border-white w-full max-w-md mx-auto relative overflow-hidden transition-all duration-300">
+            <div class="absolute top-3 right-3 text-xs text-pink-400 font-medium bg-pink-50 px-2.5 py-1 rounded-full border border-pink-100">
+                <i class="fa-solid fa-hand-pointer mr-1"></i> Tap candles to blow!
+            </div>
+
+            <!-- Cake Graphic Container -->
+            <div class="py-6 flex flex-col items-center justify-center">
+                <!-- Candles Row -->
+                <div id="candlesContainer" class="flex space-x-6 sm:space-x-8 mb-2 h-16 items-end">
+                    <!-- Candle 1 -->
+                    <div class="candle flex flex-col items-center cursor-pointer group" onclick="extinguishCandle(0)">
+                        <div class="flame w-4 h-6 bg-gradient-to-t from-amber-500 to-yellow-300 rounded-full shadow-lg mb-1"></div>
+                        <div class="w-3 h-10 bg-gradient-to-r from-pink-400 to-pink-500 rounded-t-sm shadow"></div>
+                    </div>
+                    <!-- Candle 2 -->
+                    <div class="candle flex flex-col items-center cursor-pointer group" onclick="extinguishCandle(1)">
+                        <div class="flame w-4 h-6 bg-gradient-to-t from-amber-500 to-yellow-300 rounded-full shadow-lg mb-1"></div>
+                        <div class="w-3 h-10 bg-gradient-to-r from-purple-400 to-purple-500 rounded-t-sm shadow"></div>
+                    </div>
+                    <!-- Candle 3 -->
+                    <div class="candle flex flex-col items-center cursor-pointer group" onclick="extinguishCandle(2)">
+                        <div class="flame w-4 h-6 bg-gradient-to-t from-amber-500 to-yellow-300 rounded-full shadow-lg mb-1"></div>
+                        <div class="w-3 h-10 bg-gradient-to-r from-blue-400 to-blue-500 rounded-t-sm shadow"></div>
+                    </div>
+                </div>
+
+                <!-- Cake Layers -->
+                <div class="w-56 sm:w-64">
+                    <!-- Top Frosting & Drips -->
+                    <div class="bg-pink-400 h-10 rounded-t-2xl relative shadow-md flex items-center justify-around overflow-hidden border-b-2 border-pink-300">
+                        <div class="absolute -bottom-2 w-6 h-6 bg-pink-400 rounded-full"></div>
+                        <div class="absolute -bottom-2 left-10 w-8 h-8 bg-pink-400 rounded-full"></div>
+                        <div class="absolute -bottom-2 right-10 w-8 h-8 bg-pink-400 rounded-full"></div>
+                        <div class="w-2 h-2 bg-white rounded-full opacity-60"></div>
+                        <div class="w-1.5 h-1.5 bg-white rounded-full opacity-60"></div>
+                        <div class="w-2 h-2 bg-white rounded-full opacity-60"></div>
+                    </div>
+                    <!-- Middle Layer -->
+                    <div class="bg-amber-100 h-12 border-b-2 border-amber-200 shadow-inner flex items-center justify-center">
+                        <div class="flex space-x-4">
+                            <span class="w-2 h-2 rounded-full bg-pink-500"></span>
+                            <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                            <span class="w-2 h-2 rounded-full bg-pink-500"></span>
+                        </div>
+                    </div>
+                    <!-- Bottom Base Layer -->
+                    <div class="bg-pink-300 h-14 rounded-b-2xl shadow-lg flex items-center justify-center border-t border-pink-200">
+                        <span class="font-pacifico text-white text-sm tracking-wider drop-shadow">Happy Birthday!</span>
+                    </div>
+                </div>
+                <!-- Plate -->
+                <div class="w-72 sm:w-80 h-3 bg-slate-200 rounded-full shadow-md mt-1"></div>
+            </div>
+
+            <!-- Cake Interaction Actions -->
+            <div class="mt-4 flex flex-col sm:flex-row gap-3 justify-center">
+                <button onclick="blowAllCandles()" class="bg-pink-500 hover:bg-pink-600 text-white font-medium px-5 py-2.5 rounded-xl shadow-md transition active:scale-95 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-wind"></i>
+                    <span>Blow Out Candles</span>
+                </button>
+                <button onclick="resetCandles()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-5 py-2.5 rounded-xl transition active:scale-95 flex items-center justify-center space-x-2 border border-slate-200">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>Relight</span>
+                </button>
+            </div>
+            <p id="candleStatus" class="text-xs text-slate-500 mt-3 font-medium">All candles are burning bright!</p>
+        </div>
+
+        <!-- Live Countdown Timer Card -->
+        <div class="bg-white/60 backdrop-blur-sm rounded-2xl p-5 shadow-sm border border-white/80 w-full max-w-md mx-auto">
+            <h3 class="text-sm font-semibold text-slate-600 uppercase tracking-wider mb-3">
+                <i class="fa-solid fa-hourglass-half text-pink-500 mr-1"></i> Time to Celebrate
+            </h3>
+            <div id="countdown" class="grid grid-cols-4 gap-2 text-center">
+                <div class="bg-white p-3 rounded-xl shadow-sm border border-pink-50">
+                    <span id="days" class="block text-2xl font-bold text-pink-600">00</span>
+                    <span class="text-[10px] text-slate-400 uppercase font-medium">Days</span>
+                </div>
+                <div class="bg-white p-3 rounded-xl shadow-sm border border-pink-50">
+                    <span id="hours" class="block text-2xl font-bold text-pink-600">00</span>
+                    <span class="text-[10px] text-slate-400 uppercase font-medium">Hours</span>
+                </div>
+                <div class="bg-white p-3 rounded-xl shadow-sm border border-pink-50">
+                    <span id="minutes" class="block text-2xl font-bold text-pink-600">00</span>
+                    <span class="text-[10px] text-slate-400 uppercase font-medium">Mins</span>
+                </div>
+                <div class="bg-white p-3 rounded-xl shadow-sm border border-pink-50">
+                    <span id="seconds" class="block text-2xl font-bold text-pink-600">00</span>
+                    <span class="text-[10px] text-slate-400 uppercase font-medium">Secs</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-6 text-xs text-slate-400">
+        Made with ❤️ for an amazing birthday celebration.
+    </footer>
+
+    <!-- Custom Wish Edit Modal -->
+    <div id="editModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-100 transform transition-all space-y-5">
+            <div class="flex justify-between items-center">
+                <h3 class="font-pacifico text-xl text-pink-600">Customize Greeting</h3>
+                <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600 text-lg w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Birthday Person Name / Title</label>
+                    <input type="text" id="inputTitle" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm" placeholder="Happy Birthday, Alex!">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Custom Wish Message</label>
+                    <textarea id="inputMessage" rows="3" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm resize-none" placeholder="Write a nice personal note here..."></textarea>
+                </div>
+            </div>
+            <div class="flex space-x-3 pt-2">
+                <button id="saveWishBtn" class="flex-1 bg-pink-600 hover:bg-pink-700 text-white font-medium py-3 rounded-xl shadow-md transition active:scale-95 text-sm">
+                    Save & Update
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl transform translate-y-24 opacity-0 transition-all duration-300 z-50 flex items-center space-x-3 text-sm">
+        <i class="fa-solid fa-circle-check text-pink-400 text-lg"></i>
+        <span id="toastText">Wish updated successfully!</span>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // State for candles (true = lit, false = extinguished)
+        let candleStates = [true, true, true];
+        let synth = null;
+        let isPlaying = false;
+        let melodyLoop = null;
+
+        // Initialize audio using Tone.js on user interaction
+        function initAudio() {
+            if (!synth) {
+                synth = new Tone.Synth({
+                    oscillator: { type: "triangle" },
+                    envelope: { attack: 0.05, decay: 0.2, sustain: 0.2, release: 1 }
+                }).toDestination();
+            }
+        }
+
+        // Happy Birthday simple melody notes
+        const birthdayNotes = [
+            { note: "C4", duration: "4n" }, { note: "C4", duration: "8n" }, { note: "D4", duration: "4n" }, { note: "C4", duration: "4n" }, { note: "F4", duration: "4n" }, { note: "E4", duration: "2n" },
+            { note: "C4", duration: "4n" }, { note: "C4", duration: "8n" }, { note: "D4", duration: "4n" }, { note: "C4", duration: "4n" }, { note: "G4", duration: "4n" }, { note: "F4", duration: "2n" }
+        ];
+
+        document.getElementById('musicToggle').addEventListener('click', async () => {
+            await Tone.start();
+            initAudio();
+            const icon = document.getElementById('musicIcon');
+            const text = document.getElementById('musicText');
+
+            if (!isPlaying) {
+                isPlaying = true;
+                icon.className = "fa-solid fa-pause";
+                text.textContent = "Pause Music";
+                
+                let noteIndex = 0;
+                Tone.Transport.bpm.value = 120;
+                melodyLoop = new Tone.Loop(time => {
+                    let item = birthdayNotes[noteIndex];
+                    synth.triggerAttackRelease(item.note, item.duration, time);
+                    noteIndex = (noteIndex + 1) % birthdayNotes.length;
+                }, "4n").start(0);
+
+                Tone.Transport.start();
+                showToast("Playing celebratory tune! 🎶");
+            } else {
+                isPlaying = false;
+                icon.className = "fa-solid fa-music";
+                text.textContent = "Play Music";
+                if (melodyLoop) melodyLoop.stop();
+                Tone.Transport.stop();
+                showToast("Music paused");
+            }
+        });
+
+        // Extinguish individual candle
+        function extinguishCandle(index) {
+            if (!candleStates[index]) return; // Already out
+            candleStates[index] = false;
+            updateCandleUI();
+            checkAllExtinguished();
+            playPuffSound();
+        }
+
+        // Blow out all candles
+        function blowAllCandles() {
+            if (candleStates.every(s => !s)) {
+                showToast("Candles are already blown out! Tap Relight to try again.");
+                return;
+            }
+            candleStates = [false, false, false];
+            updateCandleUI();
+            triggerConfettiBurst();
+            playPuffSound();
+            document.getElementById('candleStatus').textContent = "Make a wish! All candles are blown out! 🎂✨";
+        }
+
+        // Reset candles
+        function resetCandles() {
+            candleStates = [true, true, true];
+            updateCandleUI();
+            document.getElementById('candleStatus').textContent = "All candles are burning bright!";
+            showToast("Candles relit! Ready for another wish.");
+        }
+
+        // Update candle DOM based on state
+        function updateCandleUI() {
+            const container = document.getElementById('candlesContainer');
+            const candleElements = container.children;
+            
+            candleStates.forEach((isLit, i) => {
+                const flameEl = candleElements[i].querySelector('.flame');
+                if (isLit) {
+                    flameEl.style.display = 'block';
+                } else {
+                    flameEl.style.display = 'none';
+                }
+            });
+        }
+
+        // Check if all candles are blown out to trigger celebration
+        function checkAllExtinguished() {
+            if (candleStates.every(s => !s)) {
+                triggerConfettiBurst();
+                document.getElementById('candleStatus').textContent = "✨ Wish granted! Happy Birthday! 🎉";
+            }
+        }
+
+        // Simple audio feedback for blowing candles
+        function playPuffSound() {
+            if (synth) {
+                synth.triggerAttackRelease("G2", "8n");
+            }
+        }
+
+        // Confetti effect using canvas-confetti
+        function triggerConfettiBurst() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ec4899', '#f43f5e', '#a855f7', '#3b82f6', '#fbbf24']
+            });
+        }
+
+        // Initial automatic celebratory confetti on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                confetti({
+                    particleCount: 60,
+                    spread: 80,
+                    origin: { y: 0.4 }
+                });
+            }, 500);
+        });
+
+        // Countdown Timer Logic (Counts down to end of today or custom target)
+        function updateCountdown() {
+            const now = new Date();
+            const target = new Date();
+            target.setHours(23, 59, 59, 999); // End of today
+
+            const diff = target - now;
+            if (diff <= 0) return;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((diff / 1000 / 60) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+
+            document.getElementById('days').textContent = String(days).padStart(2, '0');
+            document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Modal Controls for Customizing Wish
+        const modal = document.getElementById('editModal');
+        document.getElementById('openModalBtn').addEventListener('click', () => {
+            document.getElementById('inputTitle').value = document.getElementById('displayTitle').textContent;
+            document.getElementById('inputMessage').value = document.getElementById('displayMessage').textContent;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        });
+
+        document.getElementById('closeModalBtn').addEventListener('click', () => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        });
+
+        document.getElementById('saveWishBtn').addEventListener('click', () => {
+            const newTitle = document.getElementById('inputTitle').value.trim();
+            const newMessage = document.getElementById('inputMessage').value.trim();
+
+            if (newTitle) document.getElementById('displayTitle').textContent = newTitle;
+            if (newMessage) document.getElementById('displayMessage').textContent = newMessage;
+
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            showToast("Birthday wish updated!");
+            triggerConfettiBurst();
+        });
+
+        // Toast Helper
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastText').textContent = message;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
